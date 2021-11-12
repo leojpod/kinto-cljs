@@ -4,7 +4,7 @@
    [re-frame.core :as re-frame]))
 
 (keyword 'create-task)
-(keyword 'list-tasks)
+(keyword 'watch-tasks)
 
 (defonce kinto
   (new js/Kinto))
@@ -19,9 +19,16 @@
         (.then #(js/console.info "task created" %))
         (.catch #(js/console.error "woops task created failed" %)))
 
-    [[::list-tasks]]
-    (println "TODO list all the tasks on kinto")))
+    [[::watch-tasks on-success]]
+    (-> tasks
+        (.-events)
+        (.on "change" (fn [res] (let [{:keys [targets]} (js->clj res :keywordize-keys true)] (re-frame/dispatch [on-success targets])))))))
 
 (re-frame/reg-fx
  :kinto
  kinto-handler)
+
+(re-frame/reg-event-fx
+ ::watch-tasks
+ (fn [_ [_ on-success]]
+   {:kinto [::watch-tasks on-success]}))

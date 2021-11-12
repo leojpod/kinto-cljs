@@ -2,4 +2,4 @@
 
 (def default-db
   {:task-input ""
-   :tasks (.collection (new js/Kinto) "tasks")})
+   :tasks []})

@@ -20,3 +20,8 @@
    (let [task-input (:task-input db)]
      {:db (assoc db :task-input "")
       :kinto [::kinto/create-task task-input]})))
+
+(re-frame/reg-event-db
+ ::update-task-list
+ (fn [db [_ tasks]]
+   (assoc db :tasks tasks)))
