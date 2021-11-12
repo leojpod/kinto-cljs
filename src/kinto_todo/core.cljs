@@ -2,13 +2,10 @@
   (:require
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
-   [re-pressed.core :as rp]
+   [kinto-todo.kinto]
    [kinto-todo.events :as events]
-   [kinto-todo.routes :as routes]
    [kinto-todo.views :as views]
-   [kinto-todo.config :as config]
-   ))
-
+   [kinto-todo.config :as config]))
 
 (defn dev-setup []
   (when config/debug?
@@ -21,8 +18,6 @@
     (rdom/render [views/main-panel] root-el)))
 
 (defn init []
-  (routes/start!)
   (re-frame/dispatch-sync [::events/initialize-db])
-  (re-frame/dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
   (dev-setup)
   (mount-root))

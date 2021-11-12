@@ -1,4 +1,5 @@
 (ns kinto-todo.db)
 
 (def default-db
-  {:name "re-frame"})
+  {:task-input ""
+   :tasks (.collection (new js/Kinto) "tasks")})

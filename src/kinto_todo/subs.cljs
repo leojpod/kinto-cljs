@@ -3,16 +3,12 @@
    [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
- ::name
+ ::task-input
  (fn [db]
-   (:name db)))
+   (:task-input db)))
 
 (re-frame/reg-sub
  ::active-panel
  (fn [db _]
    (:active-panel db)))
 
-(re-frame/reg-sub
- ::re-pressed-example
- (fn [db _]
-   (:re-pressed-example db)))

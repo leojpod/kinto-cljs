@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  h1 {
+    @apply text-xl;
+  }
+
+  input {
+    @apply m-2 p-2 border-2 border-gray-400;
+    @apply focus:shadow-lg;
+    @apply focus:outline-none;
+    @apply focus:border-blue-600;
+    @apply rounded;
+  }
+
+  button,
+  .btn {
+    @apply px-4 py-2 bg-blue-400 border-blue-600 border-2 rounded;
+    @apply hover:shadow-lg;
+  }
+}
