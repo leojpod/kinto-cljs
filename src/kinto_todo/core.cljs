@@ -13,12 +13,12 @@
 
 (defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
-  (re-frame/dispatch [::kinto/watch-tasks ::events/update-task-list])
   (let [root-el (.getElementById js/document "app")]
     (rdom/unmount-component-at-node root-el)
     (rdom/render [views/main-panel] root-el)))
 
 (defn init []
   (re-frame/dispatch-sync [::events/initialize-db])
+  (re-frame/dispatch-sync [::kinto/list-tasks ::events/update-task-list])
   (dev-setup)
   (mount-root))

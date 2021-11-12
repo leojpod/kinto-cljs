@@ -22,9 +22,18 @@
               :on-click #(re-frame/dispatch [::events/add-task])}
      [:i.gg-add]
      [:span  "Add"]]]
-   [:ul.flex.flex-col.space-y-4.p-4.border-2.rounded-lg]])
+   [:ul.flex.flex-col.space-y-4.p-4.border-2.rounded-lg
+    (map
+     (fn [{:keys [id title done]}]
+       [:li {:key id}
+        [:input {:type "checkbox"
+                 :readOnly true
+                 :checked done}]
+        [:span title]])
+     @(re-frame/subscribe [::subs/task-list]))]])
 
 ;; main
+
 
 (defn main-panel []
   (home-panel))

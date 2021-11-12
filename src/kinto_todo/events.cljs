@@ -16,10 +16,10 @@
 
 (re-frame/reg-event-fx
  ::add-task
- (fn [{:keys [db]} [_]]
+ (fn [{:keys [db]} _]
    (let [task-input (:task-input db)]
      {:db (assoc db :task-input "")
-      :kinto [::kinto/create-task task-input]})))
+      :kinto [::kinto/create-task task-input ::update-task-list]})))
 
 (re-frame/reg-event-db
  ::update-task-list

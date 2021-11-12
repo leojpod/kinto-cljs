@@ -8,7 +8,6 @@
    (:task-input db)))
 
 (re-frame/reg-sub
- ::active-panel
- (fn [db _]
-   (:active-panel db)))
+ ::task-list
+ (fn [db] (sort-by :id (:tasks db))))
 
