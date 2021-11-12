@@ -24,12 +24,14 @@
      [:span  "Add"]]]
    [:ul.flex.flex-col.space-y-4.p-4.border-2.rounded-lg
     (map
-     (fn [{:keys [id title done]}]
+     (fn [{:as task :keys [id title done]}]
        [:li {:key id}
-        [:input {:type "checkbox"
-                 :readOnly true
-                 :checked done}]
-        [:span title]])
+        [:label
+         [:input {:type "checkbox"
+                  :on-change #(re-frame/dispatch [::events/update-task (assoc task :done (not done))])
+                  :checked done}]
+         [:span title]]])
+
      @(re-frame/subscribe [::subs/task-list]))]])
 
 ;; main

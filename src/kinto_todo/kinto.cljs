@@ -4,6 +4,7 @@
    [re-frame.core :as re-frame]))
 
 (keyword 'create-task)
+(keyword 'update-task)
 (keyword 'list-tasks)
 
 (defonce kinto
@@ -31,7 +32,13 @@
     (-> tasks
         (.list)
         (.then #(re-frame/dispatch [on-success (kinto->data %)]))
-        (.catch #(js/console.error "woops, couldn't list tasks: " %)))))
+        (.catch #(js/console.error "woops, couldn't list tasks: " %)))
+
+    [[::update-task task on-success]]
+    (-> tasks
+        (.update (clj->js task))
+        (.then #(re-frame/dispatch [::list-tasks on-success]))
+        (.catch #(js/console.error "woops, couldn't update a task: " %)))))
 
 (re-frame/reg-fx
  :kinto

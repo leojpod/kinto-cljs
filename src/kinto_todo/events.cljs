@@ -25,3 +25,8 @@
  ::update-task-list
  (fn [db [_ tasks]]
    (assoc db :tasks tasks)))
+
+(re-frame/reg-event-fx
+ ::update-task
+ (fn [_ [_ task]]
+   {:kinto [::kinto/update-task task ::update-task-list]}))
