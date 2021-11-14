@@ -6,9 +6,14 @@
 (keyword 'create-task)
 (keyword 'update-task)
 (keyword 'list-tasks)
+(keyword 'delete-completed-tasks)
+(keyword 'sync-up)
 
 (defonce kinto
   (new js/Kinto))
+
+(defonce sync-settings {:remote "https://kinto.dev.mozaws.net/v1"
+                        :headers {:Authorization (str "Basic " (js/btoa "user:pass"))}})
 
 (defonce tasks (.collection kinto "tasks"))
 
@@ -19,6 +24,14 @@
               {:id (.-id js-record)
                :title (.-title js-record)
                :done (.-done js-record)}))))
+
+(defn- fix-conflicts [js-res]
+  (->> js-res
+       (js->clj)
+       (:conflicts)
+       (map (fn [conflict]
+              (.resolve tasks (clj->js conflict) (clj->js (:remote conflict)))))
+       (js/Promise.all)))
 
 (defn- kinto-handler
   [action]
@@ -38,7 +51,25 @@
     (-> tasks
         (.update (clj->js task))
         (.then #(re-frame/dispatch [::list-tasks on-success]))
-        (.catch #(js/console.error "woops, couldn't update a task: " %)))))
+        (.catch #(js/console.error "woops, couldn't update a task: " %)))
+
+    [[::delete-completed-tasks on-success]]
+    (-> tasks
+        (.list)
+        (.then (fn [js-data] (->> js-data
+                                  (kinto->data)
+                                  (filter #(:done %))
+                                  (map #(.delete tasks (:id %)))
+                                  (js/Promise.all))))
+        (.then #(re-frame/dispatch [::list-tasks on-success]))
+        (.catch #(js/console.error "woops, could not delete tasks")))
+
+    [[::sync-up on-success]]
+    (-> tasks
+        (.sync (clj->js sync-settings))
+        (.then #(fix-conflicts %))
+        (.then #(re-frame/dispatch [::list-tasks on-success]))
+        (.catch #(js/console.error "woops, could not synchronize")))))
 
 (re-frame/reg-fx
  :kinto

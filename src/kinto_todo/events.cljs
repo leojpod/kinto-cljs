@@ -30,3 +30,13 @@
  ::update-task
  (fn [_ [_ task]]
    {:kinto [::kinto/update-task task ::update-task-list]}))
+
+(re-frame/reg-event-fx
+ ::clear-completed-tasks
+ (fn [_ _]
+   {:kinto [::kinto/delete-completed-tasks ::update-task-list]}))
+
+(re-frame/reg-event-fx
+ ::sync-with-server
+ (fn [_ _]
+   {:kinto [::kinto/sync-up ::update-task-list]}))

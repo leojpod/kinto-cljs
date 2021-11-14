@@ -18,7 +18,7 @@
     [:input {:value @(re-frame/subscribe [::subs/task-input])
              :on-change #(re-frame/dispatch-sync [::events/set-task-input (-> % .-target .-value)])
              :placeholder "enter your task here"}]
-    [:button {:class "flex space-x-2 items-center"
+    [:button {:class "m-2 flex space-x-2 items-center"
               :on-click #(re-frame/dispatch [::events/add-task])}
      [:i.gg-add]
      [:span  "Add"]]]
@@ -32,7 +32,17 @@
                   :checked done}]
          [:span title]]])
 
-     @(re-frame/subscribe [::subs/task-list]))]])
+     @(re-frame/subscribe [::subs/task-list]))]
+   [:nav.flex.space-x-4
+    [:button {:class "flex space-x-2 items-center bg-gray-300"
+              :on-click #(re-frame/dispatch [::events/clear-completed-tasks])}
+     [:i.gg-trash]
+     [:span "Clear completed"]]
+    [:button {:class "flex space-x-2 items-center bg-green-400 border-green-600"
+              :on-click #(re-frame/dispatch [::events/sync-with-server])}
+
+     [:i.gg-sync]
+     [:span "Synchronize"]]]])
 
 ;; main
 
