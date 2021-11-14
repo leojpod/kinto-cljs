@@ -1,6 +1,7 @@
 (ns kinto-todo.kinto
   (:require
    [cljs.core.match :refer [match]]
+   [oops.core :refer [oget]]
    [re-frame.core :as re-frame]))
 
 (keyword 'create-task)
@@ -26,12 +27,11 @@
                :done (.-done js-record)}))))
 
 (defn- fix-conflicts [js-res]
-  (->> js-res
-       (js->clj)
-       (:conflicts)
-       (map (fn [conflict]
-              (.resolve tasks (clj->js conflict) (clj->js (:remote conflict)))))
-       (js/Promise.all)))
+  (->>  js-res
+        (#(oget % "conflicts"))
+        (map (fn [conflict]
+               (.resolve tasks conflict (oget conflict "remote"))))
+        (js/Promise.all)))
 
 (defn- kinto-handler
   [action]

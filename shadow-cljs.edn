@@ -6,6 +6,7 @@
  [[reagent "1.1.0"]
   [re-frame "1.2.0"]
   [binaryage/devtools "1.0.3"]
+  [binaryage/oops "0.7.1"]
   [re-frisk "1.5.1"]
   [day8/shadow-git-inject "0.0.5"]
   [org.clojure/core.match "1.0.0"]]

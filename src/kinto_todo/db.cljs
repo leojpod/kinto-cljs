@@ -2,4 +2,5 @@
 
 (def default-db
   {:task-input ""
-   :tasks []})
+   :tasks []
+   :editing nil})

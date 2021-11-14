@@ -23,16 +23,33 @@
      [:i.gg-add]
      [:span  "Add"]]]
    [:ul.flex.flex-col.space-y-4.p-4.border-2.rounded-lg
-    (map
-     (fn [{:as task :keys [id title done]}]
-       [:li {:key id}
-        [:label
-         [:input {:type "checkbox"
-                  :on-change #(re-frame/dispatch [::events/update-task (assoc task :done (not done))])
-                  :checked done}]
-         [:span title]]])
+    (let [editing @(re-frame/subscribe [::subs/task-editing])]
+      (doall (map
+              (fn [{:as task :keys [id title done]}]
+                (if (= id (:task-id editing))
+                  [:li.flex.items-center {:key id}
+                   [:input.flex-grow {:value (:task-name editing)
+                                      :on-change #(re-frame/dispatch-sync
+                                                   [::events/update-editing-task (-> % .-target .-value)])
+                                      :placeholder "new task name here"}]
+                   [:button {:class "bg-transparent border-0 text-gray-500 hover:text-red-700 hover:shadow-none"
+                             :on-click #(re-frame/dispatch [::events/end-editing-task false])}
+                    [:i.gg-close]]
+                   [:button {:class "bg-transparent border-0 text-gray-500 hover:text-green-700 hover:shadow-none"
+                             :on-click #(re-frame/dispatch [::events/end-editing-task true])}
+                    [:i.gg-check-o]]]
+                  [:li.flex.items-center {:key id}
+                   [:label.flex-grow
+                    [:input {:type "checkbox"
+                             :on-change #(re-frame/dispatch [::events/update-task (assoc task :done (not done))])
+                             :checked done}]
 
-     @(re-frame/subscribe [::subs/task-list]))]
+                    [:span title]]
+
+                   [:button {:class "bg-transparent border-0 text-gray-700 hover:text-blue-700 hover:shadow-none" :on-click #(re-frame/dispatch [::events/start-editing-task id])}
+                    [:i.gg-pen]]]))
+
+              @(re-frame/subscribe [::subs/task-list]))))]
    [:nav.flex.space-x-4
     [:button {:class "flex space-x-2 items-center bg-gray-300"
               :on-click #(re-frame/dispatch [::events/clear-completed-tasks])}

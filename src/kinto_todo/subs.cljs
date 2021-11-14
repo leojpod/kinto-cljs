@@ -11,3 +11,6 @@
  ::task-list
  (fn [db] (sort-by :id (:tasks db))))
 
+(re-frame/reg-sub
+ ::task-editing
+ (fn [db] (:editing db)))

@@ -14,6 +14,23 @@
  (fn [db [_ value]]
    (assoc db :task-input value)))
 
+(re-frame/reg-event-db
+ ::start-editing-task
+ (fn [db [_ task-id]]
+   (assoc
+    db
+    :editing
+    {:task-id task-id
+     :task-name (->> (:tasks db)
+                     (some #(if (= task-id (:id %))
+                              %
+                              false))
+                     (#(:title %)))})))
+(re-frame/reg-event-db
+ ::update-editing-task
+ (fn [db [_ value]]
+   (assoc-in db [:editing :task-name] value)))
+
 (re-frame/reg-event-fx
  ::add-task
  (fn [{:keys [db]} _]
@@ -40,3 +57,20 @@
  ::sync-with-server
  (fn [_ _]
    {:kinto [::kinto/sync-up ::update-task-list]}))
+
+(re-frame/reg-event-fx
+ ::end-editing-task
+ (fn [{:keys [db]} [_ should-save?]]
+   (let [editing (:editing db)]
+     (if should-save?
+       {:db (assoc db :editing :done)
+        :kinto [::kinto/update-task
+                (->> db
+                     (:tasks)
+                     (some #(if (= (:id %) (:task-id editing))
+                              %
+                              false))
+                     (#(assoc % :title (:task-name editing))))
+
+                ::update-task-list]}
+       {:db (assoc db :editing nil)}))))
