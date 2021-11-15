@@ -36,7 +36,7 @@
  (fn [{:keys [db]} _]
    (let [task-input (:task-input db)]
      {:db (assoc db :task-input "")
-      :kinto [::kinto/create-task task-input ::update-task-list]})))
+      :kinto [::kinto/create-task task-input]})))
 
 (re-frame/reg-event-db
  ::update-task-list
@@ -46,17 +46,17 @@
 (re-frame/reg-event-fx
  ::update-task
  (fn [_ [_ task]]
-   {:kinto [::kinto/update-task task ::update-task-list]}))
+   {:kinto [::kinto/update-task task]}))
 
 (re-frame/reg-event-fx
  ::clear-completed-tasks
  (fn [_ _]
-   {:kinto [::kinto/delete-completed-tasks ::update-task-list]}))
+   {:kinto [::kinto/delete-completed-tasks]}))
 
 (re-frame/reg-event-fx
  ::sync-with-server
  (fn [_ _]
-   {:kinto [::kinto/sync-up ::update-task-list]}))
+   {:kinto [::kinto/sync-up]}))
 
 (re-frame/reg-event-fx
  ::end-editing-task
@@ -70,7 +70,6 @@
                      (some #(if (= (:id %) (:task-id editing))
                               %
                               false))
-                     (#(assoc % :title (:task-name editing))))
+                     (#(assoc % :title (:task-name editing))))]}
 
-                ::update-task-list]}
        {:db (assoc db :editing nil)}))))

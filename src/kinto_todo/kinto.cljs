@@ -34,26 +34,26 @@
         (js/Promise.all)))
 
 (defn- kinto-handler
-  [action]
+  [on-success action]
   (match [action]
-    [[::create-task task-name on-success]]
+    [[::create-task task-name]]
     (-> (.create tasks (clj->js {:title task-name, :done false}))
-        (.then #(re-frame/dispatch [::list-tasks on-success]))
+        (.then #(re-frame/dispatch [::list-tasks]))
         (.catch #(js/console.error "woops task created failed" %)))
 
-    [[::list-tasks on-success]]
+    [[::list-tasks]]
     (-> tasks
         (.list)
         (.then #(re-frame/dispatch [on-success (kinto->data %)]))
         (.catch #(js/console.error "woops, couldn't list tasks: " %)))
 
-    [[::update-task task on-success]]
+    [[::update-task task]]
     (-> tasks
         (.update (clj->js task))
-        (.then #(re-frame/dispatch [::list-tasks on-success]))
+        (.then #(re-frame/dispatch [::list-tasks]))
         (.catch #(js/console.error "woops, couldn't update a task: " %)))
 
-    [[::delete-completed-tasks on-success]]
+    [[::delete-completed-tasks]]
     (-> tasks
         (.list)
         (.then (fn [js-data] (->> js-data
@@ -61,21 +61,22 @@
                                   (filter #(:done %))
                                   (map #(.delete tasks (:id %)))
                                   (js/Promise.all))))
-        (.then #(re-frame/dispatch [::list-tasks on-success]))
+        (.then #(re-frame/dispatch [::list-tasks]))
         (.catch #(js/console.error "woops, could not delete tasks")))
 
-    [[::sync-up on-success]]
+    [[::sync-up]]
     (-> tasks
         (.sync (clj->js sync-settings))
         (.then #(fix-conflicts %))
-        (.then #(re-frame/dispatch [::list-tasks on-success]))
+        (.then #(re-frame/dispatch [::list-tasks]))
         (.catch #(js/console.error "woops, could not synchronize")))))
 
-(re-frame/reg-fx
- :kinto
- kinto-handler)
+(defn init [on-success]
+  (re-frame/reg-fx
+   :kinto
+   (partial kinto-handler on-success)))
 
 (re-frame/reg-event-fx
  ::list-tasks
- (fn [_ [_ on-success]]
-   {:kinto [::list-tasks on-success]}))
+ (fn [_ _]
+   {:kinto [::list-tasks]}))

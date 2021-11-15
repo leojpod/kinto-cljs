@@ -18,6 +18,7 @@
     (rdom/render [views/main-panel] root-el)))
 
 (defn init []
+  (kinto/init ::events/update-task-list)
   (re-frame/dispatch-sync [::events/initialize-db])
   (re-frame/dispatch-sync [::kinto/list-tasks ::events/update-task-list])
   (dev-setup)
