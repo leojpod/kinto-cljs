@@ -2,6 +2,7 @@
   "name": "kinto-todo",
   "scripts": {
     "start": "npm run css:build && npx run-pty % npm run css:watch % npm run watch",
+    "css:prod": "NODE_ENV=production npm run css:build",
     "css:build": "npx tailwindcss -i src/style.css -o ./resources/public/style.css",
     "css:watch": "npx tailwindcss -i src/style.css -o ./resources/public/style.css --watch",
     "ancient": "clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version \"RELEASE\"}}}' -m antq.core",
